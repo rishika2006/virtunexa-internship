@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce Product Selling</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1 style="color: white;">e-market</h1>
+        
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search for products...">
+            <button id="search-button">Search</button>
+        </div>
+    </header>
+    <nav style="background-color: white; display: flex; padding: 10px 20px;">
+        <ul style="display: flex; justify-content: center; padding: 0; margin: 0; list-style: none; width: 100%;">
+            <li style="margin: 0 15px;"><a href="#products">Products</a></li>
+            <li style="margin: 0 15px;"><a href="#about">New Arrivals</a></li>
+            <li style="margin: 0 15px;"><a href="#contact">sale</a></li>
+            <li style="margin: 0 15px;"><a href="#contact">trending</a></li>
+            <li style="margin: 0 15px;"><a href="#contact">Contact Us</a></li>
+            <li style="margin: 0 15px;"><a href="#cart">Cart (<span id="cart-count">0</span>)</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+              <img src="https://images4.alphacoders.com/683/683743.png" alt="Hero Image" />
+              <div class="hero-text-overlay">
+                <b><h1>men's</h1></b>
+                <b><h1> collection</h1></b>
+                <p style="font-size: large;">From t-shirts,jeans,shoes,bags...</p>
+                <a href="#products" class="shop-now-button">Shop Now</a>
+              </div>
+            </div>
+          </section>
+          
+
+        
+        <!-- <h2>trending Products</h2> -->
+        <div class="trending-products">
+            <img src="https://thumbs.dreamstime.com/b/graph-icon-black-background-flat-style-line-chart-icon-your-web-site-design-logo-app-ui-trend-up-graph-symbol-graph-icon-138034875.jpg" alt="Trending Icon" class="trending-icon" />
+            <h2>Trending Products</h2>
+        </div>
+        
+        <section id="products">
+            
+            <div class="product" data-name="Product 1" data-price="800">
+                <img src="https://images.meesho.com/images/products/408069436/7s2a1_512.webp" alt="Product 1">
+                <h3>Product 1</h3>
+                <p>Price: ₹800</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 2" data-price="999">
+                <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTpXkA9h7hi3qOzRx8nkwTWy4qEtR1T6Yt3EKocqjia5qEq7_aJGTYZhsxLd5m-f6WmI0kJrok8ps-SeOBrQT9MJJwLuyZH00ApZcLQ-cs42rmF4PSicJrK" alt="Product 2">
+                <h3>Product 2</h3>
+                <p>Price: ₹999</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 3" data-price="1999">
+                <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRDUizUp8tdd9fKj4BzlvgzOUZdcI9qfeobSXVlkhHay9zPbmh0q8qezAifaS2PddAI9dCfQrcujn2pwIq3ExES8IqMulPHD4T3_FUTROZk4pUHN-rJYl6beg&usqp=CAc" alt="Product 3">
+                <h3>Product 3</h3>
+                <p>Price: ₹1,999</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 4" data-price="300">
+                <img src="https://images.meesho.com/images/products/300596293/68yxz_1200.jpg" alt="Product 4">
+                <h3>Product 4</h3>
+                <p>Price: ₹300</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 6" data-price="899">
+                <img src="https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQnikW134gfIbMs21HwP8e2uEbdMwBzRqG6stKMrBgR3XzFwB_OeCndfFrvom-7RoPl32lJzrLqEa4trWDxvxlQqHdBXgRkMxYhB2XUQamZ_0lrU8pEFFx_Zw" alt="Product 5">
+                <h3>Product 5</h3>
+                <p>Price: ₹899</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 7" data-price="200">
+                <img src="https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/5e2e871e-2b9d-4bc2-9f46-0fe7be5099e4/AIR+JORDAN+4+RM.png" alt="Product 3">
+                <h3>Product 3</h3>
+                <p>Price: ₹200</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 8" data-price="100">
+                <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS_8LNoGonNw1T2bkPwLcf5RnEnLuh_lIX32Roq59cIf68nkjv38BUH6wFu0VyEv9xhOV5YtnandbiL3aZeKGorGbvUM-6mvhTv4xShEBc" alt="Product 4">
+                <h3>Product 4</h3>
+                <p>Price: ₹100</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product" data-name="Product 5" data-price="2499">
+                <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTXYpvYM4JU3m5_QjNMSlvFfJCSLe-OK423MqB3hH4zrjyMszCmq4kmp_2-CAKMTXARDXUyMG_IRcd8TqiXzV2z5JKu7mhmHdegUnQh7-r_EhFaTHX3-xbc6XKjWXu5vXd0S2b0AA&usqp=CAc" alt="Product 5">
+                <h3>Product 5</h3>
+                <p>Price: ₹2,499</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        </section>
+
+        
+    </main>
+    <div class="features">
+        <h2>Our greatest asesst is the customer!<br> Treat each customer as they are the only one..</h2><br>
+        <div class="feature">
+            <i class="fas fa-lock"></i>  <!-- Place your icon class here -->
+            <h3>EASY EXCHANGE</h3>
+        </div>
+        <div class="feature">
+            <i class="fas fa-hand-holding-heart"></i>  <!-- Place your icon class here -->
+            <h3>100% HANDPICKED</h3>
+        </div>
+        <div class="feature">
+            <i class="fas fa-check-circle"></i>  <!-- Place your icon class here -->
+            <h3>ASSURED QUALITY</h3>
+        </div>
+    </div>
+    <footer style="background-color: #001f3f; padding: 20px; text-align: center;">
+        <div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between;">
+            <div style="flex: 1; padding: 10px;">
+                <h3>About Us</h3>
+                <p>We are a leading e-commerce platform dedicated to providing the best products at unbeatable prices. Our mission is to make shopping easy and enjoyable for everyone.</p>
+            </div>
+            <div style="flex: 1; padding: 10px;">
+                <h3>Customer Service</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="#returns">Returns & Exchanges</a></li>
+                    <li><a href="#shipping">Shipping Information</a></li>
+                    <li><a href="#faq">FAQs</a></li>
+                </ul>
+            </div>
+            <div style="flex: 1; padding: 10px;">
+                <h3>Follow Us</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="https://www.facebook.com" target="_blank">Facebook</a></li>
+                    <li><a href="https://www.instagram.com" target="_blank">Instagram</a></li>
+                    <li><a href="https://www.twitter.com" target="_blank">Twitter</a></li>
+                    <li><a href="https://www.linkedin.com" target="_blank">LinkedIn</a></li>
+                </ul>
+            </div>
+            <div style="flex: 1; padding: 10px;">
+                <h3>Newsletter Signup</h3>
+                <p>Subscribe to our newsletter for the latest updates and exclusive offers.</p>
+                <form>
+                    <input type="email" placeholder="Enter your email" style="padding: 10px; width: 80%; margin-bottom: 10px;">
+                    <button type="submit" style="padding: 10px; background-color: #007BFF; color: white; border: none; cursor: pointer;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div style="margin-top: 20px; font-size: 0.8em; color: #777;">
+            <p>&copy; 2025 e-market. All rights reserved.</p>
+            <p>Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+    
+    <script src="script.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Icon Display</title>
+    <style>
+        .features {
+            display: flex;
+            justify-content: space-around;
+        }
+        .feature {
+            text-align: center;
+        }
+        .feature i {
+            font-size: 50px;  /* Adjust size as needed */
+            display: block;
+        }
+    </style>
+</head>
+
+</html>
