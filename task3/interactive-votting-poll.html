@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VoteHub - Interactive Voting App with User Accounts</title>
+<style>
+    /* Reset & Base */
+    * {
+        box-sizing: border-box;
+    }
+    body, html {
+        margin: 0; padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #f0f0f5;
+        min-height: 100vh;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+    }
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+    a:hover {
+        color: #ffdd57;
+    }
+    /* Navbar */
+    nav {
+        position: sticky;
+        top: 0;
+        background: rgba(30, 30, 54, 0.95);
+        backdrop-filter: saturate(180%) blur(20px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        z-index: 1100;
+        transition: background-color 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+    nav h2 {
+        font-weight: 900;
+        letter-spacing: 3px;
+        font-size: 1.8rem;
+        color: #ffd93b;
+        text-shadow: 0 0 12px #ffd93baa;
+        cursor: default;
+        user-select: none;
+    }
+    nav ul {
+        list-style: none;
+        display: flex;
+        gap: 2.5rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        font-size: 1.1rem;
+        margin: 0;
+        align-items: center;
+    }
+    nav ul li {
+        position: relative;
+        padding-bottom: 3px;
+    }
+    nav ul li::after {
+        content: '';
+        position: absolute;
+        width: 0%;
+        height: 3px;
+        background: #ffd93b;
+        left: 0;
+        bottom: 0;
+        transition: 0.4s ease;
+        border-radius: 2px;
+        filter: drop-shadow(0 0 4px #ffd93b);
+    }
+    nav ul li:hover::after,
+    nav ul li:focus-within::after {
+        width: 100%;
+    }
+    nav button#btnLogout {
+        background: transparent;
+        border: 2px solid #ffd93b;
+        color: #ffd93b;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 5px 15px;
+        border-radius: 32px;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        margin-left: 1rem;
+    }
+    nav button#btnLogout:hover {
+        background-color: #ffd93b;
+        color: #2c2c3e;
+    }
+
+    /* Sections */
+    section {
+        max-width: 920px;
+        margin: 3.5rem auto 6rem;
+        padding: 1.75rem 2rem 2.75rem;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        box-shadow: 0 9px 30px rgb(0 0 0 / 0.4);
+        backdrop-filter: saturate(180%) blur(13px);
+        transition: box-shadow 0.3s ease;
+        position: relative;
+    }
+    section:hover {
+        box-shadow: 0 15px 42px rgb(255 221 87 / 0.7);
+    }
+    section h1 {
+        font-weight: 900;
+        margin-bottom: 0.85rem;
+        text-align: center;
+        letter-spacing: 2.3px;
+        text-shadow: 0 0 7px #ffd93bcc;
+        font-size: 2.6rem;
+        color: #fffde7;
+    }
+    section p {
+        line-height: 1.7;
+        font-size: 1.15rem;
+        text-align: center;
+        color: #e9e7f4dd;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        user-select: text;
+    }
+
+    /* Poll Timing */
+    #poll-timing {
+        text-align: center;
+        margin-bottom: 1.8rem;
+        font-weight: 700;
+        font-size: 1.18rem;
+        color: #ffd93b;
+        letter-spacing: 0.06em;
+        text-shadow: 0 0 10px #ffd93baa;
+        font-family: 'Courier New', Courier, monospace;
+        user-select: none;
+    }
+
+    /* Poll */
+    .poll {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1.45rem;
+        margin: 1.6rem 0 0 0;
+    }
+    .vote-button {
+        background: #ffd93b;
+        border: none;
+        color: #2c2c3e;
+        font-weight: 700;
+        font-size: 1.17rem;
+        padding: 14px 32px;
+        border-radius: 60px;
+        cursor: pointer;
+        box-shadow: 0 8px 28px rgb(255 217 54 / 0.72);
+        transition: all 0.4s cubic-bezier(.68,-0.55,.265,1.55);
+        flex: 1 1 140px;
+        max-width: 170px;
+        text-align: center;
+        user-select: none;
+        filter: drop-shadow(0 0 3px #ffdd5599);
+        border: 2.5px solid transparent;
+        outline-offset: 0;
+        outline-color: transparent;
+        will-change: transform, box-shadow;
+    }
+    .vote-button:hover:not(:disabled),
+    .vote-button:focus:not(:disabled) {
+        background: #fff947;
+        box-shadow: 0 12px 42px rgb(255 217 54 / 0.92);
+        transform: translateY(-4px) scale(1.06);
+        outline-color: #fff;
+        outline-offset: 4px;
+        border-color: #ffec0b;
+        filter: drop-shadow(0 0 5px #ffec0bcc);
+        z-index: 1;
+    }
+    .vote-button:active:not(:disabled) {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 7px 26px rgb(255 217 54 / 0.85);
+    }
+    .vote-button:disabled {
+        background: #8f8f9a;
+        color: #44454f;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none !important;
+        border-color: #666;
+        filter: none;
+    }
+
+    /* Results & Chart container */
+    #results {
+        max-width: 520px;
+        margin: 3rem auto 0;
+        background: rgba(255 255 255 / 0.16);
+        padding: 1.2rem 2.4rem 2.8rem;
+        border-radius: 18px;
+        box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.28);
+        text-align: center;
+        transition: box-shadow 0.4s ease;
+        user-select: none;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #results h2 {
+        margin-bottom: 1.2rem;
+        color: #ffe75a;
+        font-weight: 900;
+        font-size: 2rem;
+        text-shadow: 0 0 10px #ffeb7dcc;
+    }
+
+    /* Votes breakdown */
+    #votesText {
+        margin-top: 1.2rem;
+        color: #f9f7f7;
+        font-weight: 700;
+        font-size: 1.12rem;
+        text-shadow: 0 0 6px #ffd93b99;
+    }
+
+    /* Ranking list */
+    #ranking-list {
+        margin-top: 2rem;
+        text-align: left;
+        color: #fffde7;
+        font-weight: 700;
+        max-width: 100%;
+        user-select: text;
+    }
+    #ranking-list ol {
+        padding-left: 1.5em;
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+    #ranking-list li {
+        margin-bottom: 0.7em;
+        line-height: 1.25;
+        background: rgba(0,0,0,0.25);
+        padding: 8px 12px;
+        border-radius: 12px;
+        box-shadow: 0 0 8px #ffdd5599 inset;
+        transition: background-color 0.3s ease;
+    }
+    #ranking-list li:hover {
+        background: rgba(255, 221, 87, 0.35);
+        color: #292b33;
+        box-shadow: 0 0 14px #ffe75aaa inset;
+        cursor: default;
+    }
+    #ranking-list .candidate-name {
+        font-weight: 900;
+        color: #fffde7;
+    }
+    #ranking-list .candidate-details {
+        color: #ffd93b;
+        font-weight: 700;
+        margin-left: 0.4em;
+        font-size: 0.98rem;
+    }
+
+    /* Admin Panel */
+    #admin-section {
+        max-width: 620px;
+        margin: 2.5rem auto 6rem;
+        background: rgba(255 255 255 / 0.13);
+        padding: 1.55rem 2.5rem 2.5rem;
+        border-radius: 14px;
+        box-shadow: 0 9px 36px rgb(0 0 0 / 0.36);
+        color: #eae9f0;
+        user-select: none;
+    }
+    #admin-section h2 {
+        text-align: center;
+        margin-bottom: 1.2rem;
+        font-weight: 900;
+        color: #ffd93b;
+        letter-spacing: 1.5px;
+        text-shadow: 0 0 12px #ffd93bcc;
+    }
+    #admin-section form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.35rem;
+    }
+    #admin-section label {
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 0.28rem;
+        color: #fff7ba;
+        user-select: text;
+    }
+    #admin-section input[type="text"],
+    #admin-section input[type="datetime-local"] {
+        padding: 11px 16px;
+        border-radius: 12px;
+        border: 2px solid #ffd93b;
+        font-size: 1.15rem;
+        color: #2b2b39;
+        font-weight: 700;
+        outline-offset: 0;
+        outline-color: transparent;
+        transition: outline-color 0.35s ease, box-shadow 0.35s ease;
+        user-select: text;
+    }
+    #admin-section input[type="text"]:focus,
+    #admin-section input[type="datetime-local"]:focus {
+        outline-color: #ffd93b;
+        box-shadow: 0 0 14px #ffd93bbb;
+    }
+    #admin-section button {
+        background: #ffd93b;
+        border: none;
+        color: #2b2b39;
+        font-weight: 900;
+        font-size: 1.3rem;
+        padding: 14px 0;
+        border-radius: 60px;
+        cursor: pointer;
+        box-shadow: 0 8px 28px rgb(255 217 54 / 0.80);
+        transition: transform 0.33s cubic-bezier(.68,-0.55,.265,1.55), box-shadow 0.33s ease;
+        align-self: center;
+        width: 210px;
+        margin-top: 0.3rem;
+        user-select: none;
+        text-shadow: 0 0 7px #d6b819cc;
+    }
+    #admin-section button:hover,
+    #admin-section button:focus {
+        background: #fff93f;
+        box-shadow: 0 14px 42px rgb(255 217 54 / 0.98);
+        transform: translateY(-5px) scale(1.06);
+        outline: none;
+        filter: drop-shadow(0 0 8px #fff93faa);
+        z-index: 3;
+    }
+    #admin-section button:active {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 7px 30px rgb(255 217 54 / 0.92);
+    }
+
+    /* Awareness Section */
+    #awareness-section {
+        max-width: 820px;
+        margin: 3.5rem auto 6rem;
+        padding: 2.5rem 3rem;
+        background: rgba(255 255 255 / 0.18);
+        border-radius: 18px;
+        box-shadow: 0 15px 38px rgb(0 0 0 / 0.38);
+        color: #ebebf0;
+        line-height: 1.75;
+        font-size: 1.17rem;
+        letter-spacing: 0.025em;
+        text-align: center;
+        user-select: text;
+    }
+    #awareness-section h1 {
+        margin-bottom: 1.4rem;
+        color: #ffdd57;
+        font-weight: 900;
+        font-size: 2.5rem;
+        text-shadow: 0 0 14px #ffd93bcc;
+    }
+    #awareness-section p {
+        max-width: 700px;
+        margin: 0 auto 1.3rem;
+        font-weight: 600;
+    }
+    #awareness-section p strong {
+        color: #ffd93b;
+    }
+
+    /* Responsive */
+    @media (max-width: 650px) {
+        section {
+            margin: 2.5rem 1.25rem 4rem;
+            padding: 1.25rem 1.5rem 2.25rem;
+        }
+        .poll {
+            flex-direction: column;
+            align-items: center;
+        }
+        .vote-button {
+            max-width: 100%;
+            flex: none;
+        }
+        nav .container {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        nav ul {
+            width: 100%;
+            justify-content: center;
+            gap: 1.25rem;
+        }
+        #admin-section {
+            margin: 1.5rem auto 4rem;
+            padding: 1rem 1rem 1.5rem;
+        }
+        #admin-section button {
+            width: 100%;
+        }
+        #awareness-section {
+            padding: 1.25rem 1.5rem;
+            font-size: 1.05rem;
+            margin-bottom: 4rem;
+        }
+        #poll-timing {
+            font-size: 1rem;
+        }
+    }
+
+    /* Modal styles */
+    .modal {
+        position: fixed;
+        z-index: 1200;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .modal.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .modal-content {
+        background: rgba(255,255,255,0.12);
+        border-radius: 18px;
+        backdrop-filter: saturate(180%) blur(30px);
+        box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+        padding: 2rem 2.5rem;
+        max-width: 400px;
+        width: 90%;
+        color: #fffde7;
+        font-weight: 700;
+        text-align: center;
+        position: relative;
+    }
+    .modal-content h2 {
+        margin-bottom: 1rem;
+        font-size: 2rem;
+        letter-spacing: 2px;
+        color: #ffd93b;
+        text-shadow: 0 0 12px #ffd93baa;
+    }
+    .modal-content label {
+        display: block;
+        text-align: left;
+        margin-bottom: 6px;
+        color: #fff3a1;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+    .modal-content input[type="text"],
+    .modal-content input[type="password"] {
+        width: 100%;
+        padding: 10px 14px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        border: 2px solid #ffd93b;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2b2b39;
+        outline-color: transparent;
+        transition: outline-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .modal-content input[type="text"]:focus,
+    .modal-content input[type="password"]:focus {
+        outline-color: #ffd93b;
+        box-shadow: 0 0 15px #ffd93bbb;
+    }
+    .modal-content button {
+        margin-top: 5px;
+        background: #ffd93b;
+        border: none;
+        color: #2b2b39;
+        font-weight: 900;
+        font-size: 1.15rem;
+        padding: 12px 0;
+        border-radius: 60px;
+        cursor: pointer;
+        box-shadow: 0 8px 28px #ffd93bcc;
+        transition: transform 0.33s ease, box-shadow 0.33s ease;
+        width: 100%;
+    }
+    .modal-content button:hover,
+    .modal-content button:focus {
+        background: #fff947;
+        box-shadow: 0 14px 42px #fff947dd;
+        transform: translateY(-4px) scale(1.06);
+        outline: none;
+        filter: drop-shadow(0 0 10px #fff947aa);
+    }
+    .modal-content button:active {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 7px 30px #ffd93bcc;
+    }
+    .modal-close {
+        position: absolute;
+        top: 12px;
+        right: 18px;
+        font-size: 1.6rem;
+        font-weight: 900;
+        cursor: pointer;
+        color: #ffd93b;
+        user-select: none;
+        transition: transform 0.3s ease;
+    }
+    .modal-close:hover {
+        transform: rotate(90deg);
+    }
+    .modal-message {
+        margin: 12px 0 0;
+        color: #ff7777;
+        font-weight: 700;
+        font-size: 0.95rem;
+        min-height: 1.35em;
+    }
+
+    /* Screen reader only */
+    .sr-only {
+        border: 0 !important;
+        clip: rect(1px,1px,1px,1px) !important;
+        clip-path: inset(50%) !important;
+        height: 1px !important; 
+        margin: -1px !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        position: absolute !important;
+        width: 1px !important;
+        white-space: nowrap !important;
+    }
+</style>
+</head>
+<body>
+<nav>
+    <h2>VoteHub</h2>
+    <ul>
+        <li><a href="#poll-section">Poll</a></li>
+        <li><a href="#awareness-section">Voting Awareness</a></li>
+        <li><a href="#admin-section">Admin</a></li>
+        <li id="userStatusNav"><button id="btnLogout" style="display:none;" type="button" aria-label="Logout current user">Logout</button></li>
+    </ul>
+</nav>
+
+<section id="poll-section" aria-label="Voting Poll">
+    <h1>Cast Your Vote!</h1>
+    <div id="poll-timing" aria-live="polite" aria-atomic="true" aria-label="Current date and time or poll status"></div>
+    <div class="poll" role="list" aria-live="polite" aria-relevant="additions" aria-describedby="poll-buttons-desc">
+        <!-- Buttons dynamically generated -->
+    </div>
+    <p id="poll-buttons-desc" class="sr-only">Vote for any candidate by clicking a button below, if the poll is open and you haven't voted yet.</p>
+    <div id="results" aria-live="polite" aria-atomic="true" tabindex="0">
+        <h2>Current Results</h2>
+        <canvas id="resultsChart" width="400" height="400" role="img" aria-label="Pie chart showing voting results"></canvas>
+        <div id="votesText" aria-live="polite" aria-atomic="true"></div>
+        <div id="ranking-list" aria-label="Candidate ranking based on votes">
+            <!-- Ranking list dynamically generated -->
+        </div>
+    </div>
+</section>
+
+<section id="awareness-section" aria-label="Voting Awareness Information">
+    <h1>Why Your Vote Matters</h1>
+    <p><strong>Every vote counts!</strong> Voting is one of the most powerful ways you can influence your community, country, and future.</p>
+    <p>Your participation helps shape policies, leaders, and decisions that affect your daily life and the lives of future generations.</p>
+    <p>By casting your vote, you are making your voice heard and contributing to a healthier, more representative democracy.</p>
+    <p>Remember, voting is your right and your responsibility — it’s how change begins.</p>
+</section>
+
+<section id="admin-section" aria-label="Admin Panel to Manage Candidates and Poll Time">
+    <h2>Admin Panel</h2>
+    <form id="candidateForm" aria-describedby="admin-instructions">
+        <p id="admin-instructions" style="color:#f5f5d7; text-align:center;">
+            Enter candidate names below to update voting options. Leave fields blank to disable options.<br>
+            Set the poll closing date and time. Time is in your local time zone.
+        </p>
+        <label for="candidate1">Candidate 1</label>
+        <input type="text" id="candidate1" name="candidate1" maxlength="20" placeholder="Enter candidate name" autocomplete="off" required />
+        <label for="candidate2">Candidate 2</label>
+        <input type="text" id="candidate2" name="candidate2" maxlength="20" placeholder="Enter candidate name" autocomplete="off" required />
+        <label for="candidate3">Candidate 3</label>
+        <input type="text" id="candidate3" name="candidate3" maxlength="20" placeholder="Enter candidate name" autocomplete="off" />
+        <label for="candidate4">Candidate 4</label>
+        <input type="text" id="candidate4" name="candidate4" maxlength="20" placeholder="Enter candidate name" autocomplete="off" />
+        <label for="closingTime">Poll Closing Time</label>
+        <input type="datetime-local" id="closingTime" name="closingTime" aria-describedby="closingTimeHelp" required />
+        <small id="closingTimeHelp" style="color:#f5f5d7; margin-top: -1rem; margin-bottom: 1rem; display: block; text-align: center; font-size: 0.92rem;">
+            Please set a future date and time. Poll will close automatically then.
+        </small>
+        <button type="submit" aria-label="Update candidates and poll closing time, reset votes">Update Poll Settings</button>
+    </form>
+</section>
+
+<!-- Login/Signup Modal-->
+<div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-content">
+        <button class="modal-close" aria-label="Close authentication modal">&times;</button>
+        <h2 id="authModalTitle">Sign In or Sign Up</h2>
+        <div id="authFormsContainer">
+            <!-- Sign In Form -->
+            <form id="signInForm" aria-describedby="signInMessage">
+                <label for="signinUsername">Username</label>
+                <input type="text" id="signinUsername" name="signinUsername" autocomplete="username" required />
+                <label for="signinPassword">Password</label>
+                <input type="password" id="signinPassword" name="signinPassword" autocomplete="current-password" required />
+                <button type="submit">Sign In</button>
+                <p id="signInMessage" class="modal-message" aria-live="assertive" aria-atomic="true"></p>
+                <p style="margin-top:1.2rem; font-weight:600; color:#ffd93b;">
+                  Don't have an account? <button type="button" id="switchToSignUpBtn" style="background:none; border:none; color:#ffd93b; cursor:pointer; font-weight:700; font-size:1rem;">Sign Up</button>
+                </p>
+            </form>
+            <!-- Sign Up Form -->
+            <form id="signUpForm" aria-describedby="signUpMessage" style="display:none;">
+                <label for="signupUsername">Choose Username</label>
+                <input type="text" id="signupUsername" name="signupUsername" autocomplete="username" required />
+                <label for="signupPassword">Choose Password</label>
+                <input type="password" id="signupPassword" name="signupPassword" autocomplete="new-password" required />
+                <button type="submit">Sign Up</button>
+                <p id="signUpMessage" class="modal-message" aria-live="assertive" aria-atomic="true"></p>
+                <p style="margin-top:1.2rem; font-weight:600; color:#ffd93b;">
+                  Already have an account? <button type="button" id="switchToSignInBtn" style="background:none; border:none; color:#ffd93b; cursor:pointer; font-weight:700; font-size:1rem;">Sign In</button>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(() => {
+    const pollDiv = document.querySelector('.poll');
+    const votesTextDiv = document.getElementById('votesText');
+    const rankingListDiv = document.getElementById('ranking-list');
+    const pollTimingDiv = document.getElementById('poll-timing');
+    const closingTimeInput = document.getElementById('closingTime');
+    const btnLogout = document.getElementById('btnLogout');
+    const userStatusNav = document.getElementById('userStatusNav');
+
+    const authModal = document.getElementById('authModal');
+    const signInForm = document.getElementById('signInForm');
+    const signUpForm = document.getElementById('signUpForm');
+    const switchToSignUpBtn = document.getElementById('switchToSignUpBtn');
+    const switchToSignInBtn = document.getElementById('switchToSignInBtn');
+    const authCloseBtn = authModal.querySelector('.modal-close');
+    const signInMessage = document.getElementById('signInMessage');
+    const signUpMessage = document.getElementById('signUpMessage');
+
+    const storageKeyVotes = 'voteCountsByUser'; // stores votes per user: {username: {candidate:count,...}}
+    const storageKeyCandidates = 'voteCandidates';
+    const storageKeyClosingTime = 'pollClosingTime';
+    const storageKeyUsers = 'voteUsers';  // users object {username:hashedPassword}
+    const storageKeyCurrentUser = 'currentUser';
+    
+    // We'll store current votes for the logged in user only
+    let candidateNames = [];
+    let pollClosingTime = null;
+    let currentUser = null;
+    let userVotes = {}; // votes for current user only
+
+    // Chart.js Setup
+    let chart = new Chart(document.getElementById('resultsChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Votes',
+                data: [],
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                ],
+                borderColor: '#292b33',
+                borderWidth: 2,
+                hoverOffset: 20,
+                hoverBorderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#ffd93b',
+                        font: { weight: '600', size: 14 }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: function(ctx) {
+                            var label = ctx.label || '';
+                            var value = ctx.parsed || 0;
+                            return label + ': ' + value + ' vote' + (value !== 1 ? 's' : '');
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    /* -------- Helper Functions -------- */
+
+    function hashPassword(password) {
+        // Basic hashing - NOT secure, just to simulate
+        let hash = 0, i, chr;
+        if (password.length === 0) return hash.toString();
+        for (i = 0; i < password.length; i++) {
+            chr = password.charCodeAt(i);
+            hash = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash.toString();
+    }
+
+    function formatDateTime(date) {
+        const options = { 
+            weekday:'short', year:'numeric', month:'short', day:'numeric', 
+            hour:'2-digit', minute:'2-digit', second:'2-digit' 
+        };
+        return date.toLocaleString(undefined, options);
+    }
+    function isValidDate(d) {
+        return d instanceof Date && !isNaN(d);
+    }
+
+    /* ------------ Authentication ------------ */
+
+    function showModal() {
+        authModal.classList.add('show');
+    }
+    function hideModal() {
+        authModal.classList.remove('show');
+        clearAuthMessages();
+        signInForm.reset();
+        signUpForm.reset();
+    }
+
+    function clearAuthMessages() {
+        signInMessage.textContent = '';
+        signUpMessage.textContent = '';
+    }
+
+    function getStoredUsers() {
+        return JSON.parse(localStorage.getItem(storageKeyUsers)) || {};
+    }
+    function saveStoredUsers(users) {
+        localStorage.setItem(storageKeyUsers, JSON.stringify(users));
+    }
+
+    function getCurrentUser() {
+        return localStorage.getItem(storageKeyCurrentUser);
+    }
+    function setCurrentUser(username) {
+        currentUser = username;
+        if (username) {
+            localStorage.setItem(storageKeyCurrentUser, username);
+        } else {
+            localStorage.removeItem(storageKeyCurrentUser);
+        }
+        updateUserInterface();
+    }
+
+    function updateUserInterface() {
+        currentUser = getCurrentUser();
+        if (currentUser) {
+            btnLogout.style.display = 'inline-block';
+            btnLogout.textContent = `Logout (${currentUser})`;
+            userStatusNav.style.display = 'block';
+            hideModal();
+            loadUserVotes();
+            renderVoteButtons(); // in case some enabling logic depends on user
+            updateResults();
+            updateVoteButtonsState();
+        } else {
+            btnLogout.style.display = 'none';
+            userStatusNav.style.display = 'none';
+            showModal();
+        }
+    }
+
+    /* ------------ Voting Functions ------------ */
+
+    // Fetch all users' votes aggregates
+    // votesData = {username: {candidate: count,...}, ...}
+    function getAllUsersVotes() {
+        return JSON.parse(localStorage.getItem(storageKeyVotes)) || {};
+    }
+    function saveAllUsersVotes(data) {
+        localStorage.setItem(storageKeyVotes, JSON.stringify(data));
+    }
+
+    // Load current user's votes or initialize
+    function loadUserVotes() {
+        const allVotes = getAllUsersVotes();
+        userVotes = allVotes[currentUser] || {};
+    }
+
+    // Save user votes back to localStorage
+    function saveUserVotes() {
+        const allVotes = getAllUsersVotes();
+        allVotes[currentUser] = userVotes;
+        saveAllUsersVotes(allVotes);
+    }
+
+    // Aggregate votes across all users for candidates
+    function getAggregatedVotes() {
+        const allVotes = getAllUsersVotes();
+        let aggregate = {};
+        candidateNames.forEach(cand => { if (cand.trim() !== '') aggregate[cand]=0; });
+        for (const userVoteSet of Object.values(allVotes)) {
+            for (const [cand, cnt] of Object.entries(userVoteSet)) {
+                if (aggregate.hasOwnProperty(cand)) {
+                    aggregate[cand] += typeof cnt === 'number' ? cnt : 0;
+                }
+            }
+        }
+        return aggregate;
+    }
+
+    /* ------------ UI Rendering ------------ */
+
+    function renderVoteButtons() {
+        pollDiv.innerHTML = '';
+        candidateNames.forEach(name => {
+            if (name.trim() === '') return;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'vote-button';
+            button.setAttribute('data-option', name);
+            button.setAttribute('aria-label', 'Vote for ' + name);
+            button.textContent = name;
+            pollDiv.appendChild(button);
+        });
+        updateVoteButtonsState();
+        attachVoteListeners();
+    }
+    function updateVoteButtonsState() {
+        const isOpen = checkPollOpen();
+        const userVoted = hasUserVoted();
+        if (!isOpen) {
+            pollDiv.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            showPollClosedMessage();
+            return;
+        }
+        if (!currentUser) {
+            pollDiv.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            showSignInMessage();
+            return;
+        }
+        if (userVoted) {
+            pollDiv.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            showUserAlreadyVotedMessage();
+            return;
+        }
+        pollDiv.querySelectorAll('button').forEach(btn => btn.disabled = false);
+        clearPollStatusMessage();
+        clearSignInMessage();
+    }
+
+    function showPollClosedMessage() {
+        pollTimingDiv.textContent = 'The poll is now closed. Thank you for your interest!';
+        pollTimingDiv.style.color = '#ff5555';
+        pollTimingDiv.style.textShadow = '0 0 12px #ff5555cc';
+    }
+    function showUserAlreadyVotedMessage() {
+        pollTimingDiv.textContent = 'You have already voted. Thank you for participating!';
+        pollTimingDiv.style.color = '#98ff98';
+        pollTimingDiv.style.textShadow = '0 0 14px #76dd76cc';
+    }
+    function clearPollStatusMessage() {
+        if (pollClosingTime) {
+            pollTimingDiv.style.color = '#ffd93b';
+            pollTimingDiv.style.textShadow = '0 0 10px #ffd93b99';
+        }
+    }
+    function showSignInMessage() {
+        pollTimingDiv.textContent = 'Please sign in to vote.';
+        pollTimingDiv.style.color = '#ffd93b';
+        pollTimingDiv.style.textShadow = '0 0 10px #ffd93b99';
+    }
+    function clearSignInMessage() {
+        if (pollClosingTime) {
+            pollTimingDiv.style.color = '#ffd93b';
+            pollTimingDiv.style.textShadow = '0 0 10px #ffd93b99';
+        }
+    }
+
+    // Update votes text summary
+    function updateVotesText() {
+        const aggregate = getAggregatedVotes();
+        const totalVotes = Object.values(aggregate).reduce((a,b) => a+b, 0);
+        if (totalVotes === 0) {
+            votesTextDiv.textContent = 'No votes cast yet. Be the first!';
+            rankingListDiv.innerHTML = '';
+            return;
+        }
+        let text = 'Total Votes: ' + totalVotes + ' | ';
+        for (const [option, count] of Object.entries(aggregate)) {
+            text += option + ': ' + count + ' vote' + (count !== 1 ? 's' : '') + ', ';
+        }
+        votesTextDiv.textContent = text.slice(0, -2) + '.';
+    }
+
+    // Update ranking list
+    function updateRankingList() {
+        const aggregate = getAggregatedVotes();
+        const totalVotes = Object.values(aggregate).reduce((a,b) => a+b, 0);
+        if (totalVotes === 0) {
+            rankingListDiv.innerHTML = '';
+            return;
+        }
+        let rankingArr = candidateNames
+            .filter(n => n.trim() !== '')
+            .map(name => ({
+                name: name,
+                votes: aggregate[name] || 0,
+                percentage: totalVotes ? ((aggregate[name] || 0) / totalVotes) * 100 : 0
+            }))
+            .sort((a, b) => b.votes - a.votes);
+
+        const ol = document.createElement('ol');
+        rankingArr.forEach(candidate => {
+            const li = document.createElement('li');
+            li.innerHTML = '<span class="candidate-name">' + candidate.name +
+                '</span><span class="candidate-details"> — ' + candidate.votes + ' vote' + (candidate.votes !== 1 ? 's' : '') + ' (' +
+                candidate.percentage.toFixed(2) + '%)</span>';
+            ol.appendChild(li);
+        });
+        rankingListDiv.innerHTML = '';
+        rankingListDiv.appendChild(ol);
+    }
+
+    // Update chart and text
+    function updateResults() {
+        chart.data.labels = candidateNames.filter(n => n.trim() !== '');
+        const aggregate = getAggregatedVotes();
+        chart.data.datasets[0].data = candidateNames.filter(n => n.trim() !== '').map(function(name) { return aggregate[name] || 0; });
+        chart.update();
+        updateVotesText();
+        updateRankingList();
+    }
+
+    // Vote button click handler
+    function attachVoteListeners() {
+        document.querySelectorAll('.vote-button').forEach(button => {
+            button.onclick = () => {
+                if (!checkPollOpen()) return;
+                if (!currentUser) {
+                    alert('Please sign in to vote.');
+                    showModal();
+                    return;
+                }
+                if (hasUserVoted()) return;
+
+                const option = button.getAttribute('data-option');
+                userVotes[option] = (userVotes[option] || 0) + 1;
+                saveUserVotes();
+                updateResults();
+                markUserVoted();
+                updateVoteButtonsState();
+            };
+        });
+    }
+
+    // Voting eligibility for current user
+    function hasUserVoted() {
+        // Check if userVotes has any votes > 0
+        return Object.values(userVotes).some(count => count > 0);
+    }
+    function markUserVoted() {
+        // just flag presence in userVotes suffices, no separate flag needed here
+    }
+
+    /*  Poll Open/Close */
+
+    function checkPollOpen() {
+        if (!pollClosingTime) return true;
+        return new Date() < pollClosingTime;
+    }
+
+    /* Load/Save Data */
+
+    function loadUserVotes() {
+        const allVotes = getAllUsersVotes();
+        userVotes = allVotes[currentUser] || {};
+    }
+    function saveUserVotes() {
+        const allVotes = getAllUsersVotes();
+        allVotes[currentUser] = userVotes;
+        saveAllUsersVotes(allVotes);
+    }
+    function getAllUsersVotes() {
+        return JSON.parse(localStorage.getItem(storageKeyVotes)) || {};
+    }
+    function saveAllUsersVotes(data) {
+        localStorage.setItem(storageKeyVotes, JSON.stringify(data));
+    }
+
+    /* Initialize Poll */
+
+    function initializePoll(names, closingTimeStr) {
+        candidateNames = names;
+        pollClosingTime = closingTimeStr ? new Date(closingTimeStr) : null;
+        if (!isValidDate(pollClosingTime)) pollClosingTime = null;
+
+        closingTimeInput.value = closingTimeStr || '';
+        if (currentUser) {
+            loadUserVotes();
+        } else {
+            userVotes = {};
+        }
+        renderVoteButtons();
+        updateResults();
+        updateVoteButtonsState();
+        startPollTimer();
+    }
+
+    /* Auth Modal Switch */
+
+    switchToSignUpBtn.onclick = () => {
+        signInForm.style.display = 'none';
+        signUpForm.style.display = 'block';
+        clearAuthMessages();
+    };
+    switchToSignInBtn.onclick = () => {
+        signUpForm.style.display = 'none';
+        signInForm.style.display = 'block';
+        clearAuthMessages();
+    };
+    authCloseBtn.onclick = () => {
+        if (!currentUser) return; // can't close modal without sign in
+        hideModal();
+    };
+    window.onclick = e => {
+        if (e.target === authModal && currentUser) {
+            hideModal();
+        }
+    };
+
+    /* Auth Forms */
+
+    signUpForm.onsubmit = e => {
+        e.preventDefault();
+        clearAuthMessages();
+        const username = signUpForm.signupUsername.value.trim();
+        const password = signUpForm.signupPassword.value;
+
+        if (!username || !password) {
+            signUpMessage.textContent = 'Please enter username and password.';
+            return;
+        }
+        if (username.includes(' ')) {
+            signUpMessage.textContent = 'Username cannot contain spaces.';
+            return;
+        }
+        let users = getStoredUsers();
+        if (users[username]) {
+            signUpMessage.textContent = 'Username already exists.';
+            return;
+        }
+        users[username] = hashPassword(password);
+        saveStoredUsers(users);
+        setCurrentUser(username);
+        signUpMessage.textContent = '';
+        hideModal();
+    };
+
+    signInForm.onsubmit = e => {
+        e.preventDefault();
+        clearAuthMessages();
+        const username = signInForm.signinUsername.value.trim();
+        const password = signInForm.signinPassword.value;
+
+        if (!username || !password) {
+            signInMessage.textContent = 'Please enter username and password.';
+            return;
+        }
+        let users = getStoredUsers();
+        if (!users[username]) {
+            signInMessage.textContent = 'Username does not exist.';
+            return;
+        }
+        if (users[username] !== hashPassword(password)) {
+            signInMessage.textContent = 'Incorrect password.';
+            return;
+        }
+        setCurrentUser(username);
+        signInMessage.textContent = '';
+        hideModal();
+    };
+
+    /* Admin Logout */
+
+    btnLogout.onclick = () => {
+        setCurrentUser(null);
+        showModal();
+    };
+
+    /* Modal Control */
+
+    function showModal() {
+        authModal.classList.add('show');
+    }
+    function hideModal() {
+        authModal.classList.remove('show');
+    }
+
+    /* Poll Timer */
+
+    let pollTimerInterval = null;
+    function startPollTimer() {
+        if (pollTimerInterval) clearInterval(pollTimerInterval);
+        function updateTimer() {
+            const now = new Date();
+            if (!pollClosingTime) {
+                pollTimingDiv.textContent = 'Poll end time not set. Voting is open.';
+                pollTimingDiv.style.color = '#ffd93b';
+                pollTimingDiv.style.textShadow = '0 0 10px #ffd93b99';
+                updateVoteButtonsState();
+                return;
+            }
+            if (now >= pollClosingTime) {
+                showPollClosedMessage();
+                updateVoteButtonsState();
+                clearInterval(pollTimerInterval);
+                return;
+            }
+            // Show countdown
+            const diffMs = pollClosingTime - now;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const days = Math.floor(diffSecs / 86400);
+            const hours = Math.floor((diffSecs % 86400) / 3600);
+            const minutes = Math.floor((diffSecs % 3600) / 60);
+            const seconds = diffSecs % 60;
+
+            const timeStr = (days > 0 ? days + 'd ' : '') +
+                (hours < 10 ? '0'+hours : hours) + ':' +
+                (minutes < 10 ? '0'+minutes : minutes) + ':' +
+                (seconds < 10 ? '0'+seconds : seconds);
+
+            pollTimingDiv.textContent = 'Poll closes in: ' + timeStr + ' (Local time: ' + formatDateTime(pollClosingTime) + ')';
+            pollTimingDiv.style.color = '#ffd93b';
+            pollTimingDiv.style.textShadow = '0 0 10px #ffd93b99';
+
+            updateVoteButtonsState();
+        }
+        updateTimer();
+        pollTimerInterval = setInterval(updateTimer, 1000);
+    }
+
+    /* Admin Panel Handling */
+
+    const candidateForm = document.getElementById('candidateForm');
+    candidateForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const formdata = new FormData(candidateForm);
+        const newCandidates = [
+            formdata.get('candidate1')?.trim() || '',
+            formdata.get('candidate2')?.trim() || '',
+            formdata.get('candidate3')?.trim() || '',
+            formdata.get('candidate4')?.trim() || ''
+        ].filter(function(v, i, a) { return v !== '' && a.indexOf(v) === i; });
+
+        const closingTimeVal = formdata.get('closingTime') || null;
+
+        if (newCandidates.length < 2) {
+            alert('Please enter at least two unique candidate names.');
+            return;
+        }
+        if (!closingTimeVal) {
+            alert('Please set a valid poll closing time.');
+            return;
+        }
+        const closingTimeDate = new Date(closingTimeVal);
+        if (isNaN(closingTimeDate) || closingTimeDate <= new Date()) {
+            alert('Closing time must be a valid future date and time.');
+            return;
+        }
+
+        // Reset votes of all users - ask for confirmation if needed
+        if (!confirm('Updating poll settings will reset votes for all users. Continue?')) {
+            return;
+        }
+
+        // Reset all users votes
+        saveAllUsersVotes({});
+
+        // Save settings
+        localStorage.setItem(storageKeyCandidates, JSON.stringify(newCandidates));
+        localStorage.setItem(storageKeyClosingTime, closingTimeVal);
+
+        initializePoll(newCandidates, closingTimeVal);
+    });
+
+    /* Initial Load */
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let savedCandidates = JSON.parse(localStorage.getItem(storageKeyCandidates));
+        let savedClosingTimeStr = localStorage.getItem(storageKeyClosingTime);
+
+        currentUser = getCurrentUser();
+
+        if (!currentUser) {
+            showModal();
+        } else {
+            userStatusNav.style.display = 'block';
+            btnLogout.textContent = 'Logout (' + currentUser + ')';
+            btnLogout.style.display = 'inline-block';
+        }
+
+        if (savedCandidates && savedCandidates.length >= 2) {
+            candidateForm.candidate1.value = savedCandidates[0] || '';
+            candidateForm.candidate2.value = savedCandidates[1] || '';
+            candidateForm.candidate3.value = savedCandidates[2] || '';
+            candidateForm.candidate4.value = savedCandidates[3] || '';
+            candidateForm.closingTime.value = savedClosingTimeStr || '';
+
+            initializePoll(savedCandidates, savedClosingTimeStr);
+        } else {
+            // Defaults: 2 days from now
+            const defaultCandidates = ['Cats', 'Dogs', 'Birds', 'Fish'];
+            candidateForm.candidate1.value = defaultCandidates[0];
+            candidateForm.candidate2.value = defaultCandidates[1];
+            candidateForm.candidate3.value = defaultCandidates[2];
+            candidateForm.candidate4.value = defaultCandidates[3];
+
+            const twoDaysLater = new Date(Date.now() + 2*24*60*60*1000);
+            const defaultCloseStr = twoDaysLater.toISOString().slice(0,16);
+            candidateForm.closingTime.value = defaultCloseStr;
+
+            initializePoll(defaultCandidates, defaultCloseStr);
+        }
+    });
+})();
+</script>
+</body>
+</html>
+

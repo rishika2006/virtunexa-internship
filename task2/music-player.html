@@ -369,6 +369,9 @@
     border: none;
     box-shadow: 0 2px 6px rgba(79,195,247,0.5);
     margin-top: 1rem;
+    cursor: pointer;
+    background-color: #4fc3f7;
+    color: #0d0d0d;
   }
   #extra-controls button.active {
     background-color: #81d4fa;
@@ -960,4 +963,37 @@
 </script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Music Player Fixed Example</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #141e30;
+    color: #eaeaea;
+    margin: 0;
+    padding: 1rem;
+  }
+</style>
+</head>
+<body>
+  <div id="player-info"></div>
+  <button id="dark-mode-toggle" aria-pressed="false">Toggle Dark Mode</button>
+<script>
+  const playerInfo = document.getElementById('player-info');
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+  // Example song object
+  const song = {
+    title: 'Example Song',
+    trackName: 'Example Song Track',
+    artist: 'Example Artist',
+    artistName: 'Example Artist Name'
+  };
+
+ 
 
